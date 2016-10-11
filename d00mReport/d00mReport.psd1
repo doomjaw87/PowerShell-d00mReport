@@ -12,7 +12,7 @@
 RootModule = 'd00mReport'
 
 # Version number of this module.
-ModuleVersion = '1.1'
+ModuleVersion = '1.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -105,16 +105,17 @@ PrivateData = @{
         Tags = @('Hardware', 'Software', 'Service', 'Diskspace', 'EventLog', 'Winsat', 'Report', 'Reporting', 'Monitor', 'HTML')
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/doomjaw87/P0w3rSh3ll/blob/master/LICENSE'
+        LicenseUri = 'https://github.com/doomjaw87/PowerShell-d00mReport/blob/master/LICENSE'
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/doomjaw87/P0w3rSh3ll/blob/master/LICENSE'
+        ProjectUri = 'https://github.com/doomjaw87/PowerShell-d00mReport'
 
         # A URL to an icon representing this module.
-        IconUri = 'https://github.com/doomjaw87/P0w3rSh3ll/blob/master/Modules/d00mReport/d00mReport_icon.ico?raw=true'
+        IconUri = 'https://github.com/doomjaw87/PowerShell-d00mReport/blob/master/d00mReport_icon.ico?raw=true'
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- 20161010 - Added function that generates monitor HTML report!
+        ReleaseNotes = '- 20161011 - Moved to own GitHub repository because that is a thing
+- 20161010 - Added function that generates monitor HTML report!
 - 20161010 - First production ready release!'
 
     } # End of PSData hashtable
