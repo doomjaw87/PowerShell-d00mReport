@@ -111,7 +111,7 @@ PrivateData = @{
         ProjectUri = 'https://github.com/doomjaw87/PowerShell-d00mReport'
 
         # A URL to an icon representing this module.
-        IconUri = 'https://github.com/doomjaw87/PowerShell-d00mReport/blob/master/d00mReport_icon.ico?raw=true'
+        IconUri = 'https://github.com/doomjaw87/PowerShell-d00mReport/blob/master/d00mReport/d00mReport_icon.ico?raw=true'
 
         # ReleaseNotes of this module
         ReleaseNotes = '- 20161011 - Moved to own GitHub repository because that is a thing
