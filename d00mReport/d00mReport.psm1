@@ -7,27 +7,33 @@
     via CIM and generates an HTML report saved to the
     file system
 
-.EXAMPLE
-    Get-d00mHardwareReport
+.PARAMETER ComputerName
+    The computers to which to execute this report
 
-    This example generates a system inventory HTML report
-    saved to the current file system location using the
-    default credentials.
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
+
+.EXAMPLE
+    Get-d00mHardwareReport -ComputerName Localhost
+
+    This example generates a system inventory HTML report of the localhost
+    saved to the current file system location using the default credentials.
 
 .EXAMPLE
     Computer1, Computer2 | Get-d00mHardwareReport
 
-    This example generates a system inventory HTML report
-    for the computer names piped in to the cmdlet saved
-    to the current file system location using the default
-    credentials.
+    This example generates a system inventory HTML report for the computer 
+    names piped in to the cmdlet saved to the current file system location 
+    using the default credentials.
 
 .EXAMPLE
     Get-d00mHardwareReport -ComputerName Computer1 -Credential (Get-Credential)
 
-    This example generates a systme inventory HTML report
-    for Computer1 using the credentials suppied saved to
-    the current file system location.
+    This example generates a systme inventory HTML report for Computer1 
+    using the credentials suppied saved to the current file system location.
 
 .EXAMPLE
     Get-d00mHardwareReport -FilePath c:\path\to\report
@@ -42,15 +48,17 @@ function Get-d00mHardwareReport
     param
     (
         #Computer names to create a systems inventory report
-        [parameter(ValueFromPipeline = $true,
-                   ValueFromPipelineByPropertyName = $true)]
-        [string[]]$ComputerName = $env:COMPUTERNAME,
+        [alias('name')]
+        [parameter(Mandatory,
+                   ValueFromPipeline,
+                   ValueFromPipelineByPropertyName)]
+        [string[]]$ComputerName,
 
         #File system path to save the report
         [parameter()]
         [string]$FilePath = $(Get-Location),
 
-        #Credentials to use for querying WMI
+        #Credentials to use for querying CIM
         [parameter()]
         [pscredential]$Credential
     )
@@ -823,7 +831,7 @@ function Get-d00mHardwareReport
                     }
                 }
                 $cim = $null
-
+                $html.AppendLine('</body></html>') | Out-Null
                 $html.ToString() | 
                     Out-File -FilePath ('{0}\{1}_HardwareReport_{2}.html' -f $FilePath, 
                                                                              $computer, 
@@ -855,33 +863,38 @@ function Get-d00mHardwareReport
     generates an HTML report saved to the current
     file path location by default
 
-.EXAMPLE
-    Get-d00mSoftwareReport
+.PARAMETER ComputerName
+    The computers to which to execute this report
 
-    This example generates an installed software HTML report
-    for the local computer and saved to the current file path
-    location.
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
+
+.EXAMPLE
+    Get-d00mSoftwareReport -ComputerName LocalHost
+
+    This example generates an installed software HTML report for the local computer 
+    and saved to the current file path location.
     
 .EXAMPLE
     Get-d00mSoftwareReport -ComputerName Computer1, Computer2
 
-    This example generates an installed software HTML report
-    for the remote computers, Computer1 and Computer2, and saves
-    them to the current file path location
+    This example generates an installed software HTML report for the remote computers, 
+    Computer1 and Computer2, and saves them to the current file path location
 
 .EXAMPLE
     'Computer1' | Get-d00mSoftwareReport -Credential (Get-Credential)
 
-    This example generates an installed software HTML report
-    for the piped in computer name using the credentials supplied and
-    saves to the current file path location
+    This example generates an installed software HTML report for the piped in computer 
+    name using the credentials supplied and saves to the current file path location
 
 .EXAMPLE
     (Get-AdComputer -Filter {(Enabled -eq 'true')}).Name | Get-d00mSoftwareReport -FilePath C:\path
 
-    This example generates an installed software HTML report for each
-    of the computer names returned from the Get-AdComputer cmdlet and saves
-    them to the file path specifed
+    This example generates an installed software HTML report for each of the computer 
+    names returned from the Get-AdComputer cmdlet and saves them to the file path specifed
 #>
 function Get-d00mSoftwareReport
 {
@@ -889,9 +902,11 @@ function Get-d00mSoftwareReport
     param
     (
         #Computer names to create an installed software inventory report
-        [parameter(ValueFromPipeline = $true,
-                   ValueFromPipelineByPropertyName = $true)]
-        [string[]]$ComputerName = $env:COMPUTERNAME,
+        [alias('name')]
+        [parameter(Mandatory,
+                   ValueFromPipeline,
+                   ValueFromPipelineByPropertyName)]
+        [string[]]$ComputerName,
 
         #File system path to save the report
         [parameter()]
@@ -1066,6 +1081,7 @@ function Get-d00mSoftwareReport
                                   $_.Comments,
                                   $_.KeyName)) | Out-Null
                     }
+                $html.AppendLine('</body></html>') | Out-Null
                 $html.ToString() | 
                     Out-File -FilePath ('{0}\{1}_SoftwareReport_{2}.html' -f $FilePath, 
                                                                              $computer, 
@@ -1096,11 +1112,20 @@ function Get-d00mSoftwareReport
     Executes Get-Service on computers and gets the Name, DisplayName, ServiceName, Status,
     and StartType and generates an HTML report in the current file system location by default.
 
-.EXAMPLE
-    Get-d00mServiceReport
+.PARAMETER ComputerName
+    The computers to which to execute this report
 
-    This example gets the services on the local machine using the default credentials
-    and generates an HTML report in the current file system location.
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
+
+.EXAMPLE
+    Get-d00mServiceReport -ComputerName LocalHost
+
+    This example gets the services on the local machine using the default credentials and generates 
+    an HTML report in the current file system location.
 
 .EXAMPLE
     Get-d00mServiceReport -ComputerName Computer1, Computer2
@@ -1115,10 +1140,10 @@ function Get-d00mSoftwareReport
     credentials and generates an HTML report in the current file system location.
 
 .EXAMPLe
-    Get-d00mServiceReport -FilePath c:\path
+    Get-d00mServiceReport -ComputerName LocalHost -FilePath c:\path
 
-    This example gets the services for the local computer using the default credentials and
-    generates an HTML report saved to the specified file system path.
+    This example gets the services for the local computer using the default credentials and generates 
+    an HTML report saved to the specified file system path.
 #>
 function Get-d00mServiceReport
 {
@@ -1126,9 +1151,11 @@ function Get-d00mServiceReport
     param
     (
         #Computer names to create a services report
-        [parameter(ValueFromPipeline = $true,
-                   ValueFromPipelineByPropertyName = $true)]
-        [string[]]$ComputerName = $env:COMPUTERNAME,
+        [alias('name')]
+        [parameter(Mandatory,
+                   ValueFromPipeline,
+                   ValueFromPipelineByPropertyName)]
+        [string[]]$ComputerName,
 
         #File system path to save the report
         [parameter()]
@@ -1255,6 +1282,7 @@ function Get-d00mServiceReport
                                               $_.Status,
                                               $_.StartType)) | Out-Null
                     }
+                $html.AppendLine('</body></html') | Out-Null
                 $html.ToString() | 
                     Out-File -FilePath ('{0}\{1}_SoftwareReport_{2}.html' -f $FilePath, 
                                                                              $computer, 
@@ -1280,34 +1308,40 @@ function Get-d00mServiceReport
 
 <#
 .SYNOPSIS
-    Get disk space statistics
+    Generate disk space utilization HTML report
 
 .DESCRIPTION
-    Query hard drives in Win32_LogicalDisk for size and freespace
-    in GB and percent of diskspace still free using a CIM session
+    Query hard drives in Win32_LogicalDisk for size and freespace in GB and percent 
+    of diskspace still free using a CIM session
+
+.PARAMETER ComputerName
+    The computers to which to execute this report
+
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
 
 .EXAMPLE
-    Get-d00mDiskSpace
+    Get-d00mDiskSpace -ComputerName LocalHost
 
-    This example queries Win32_LogicalDisk on the local machine
-    and gets freespace (GB), size (GB), and percent free for each
-    disk using default credentials through a CIM session
+    This example queries Win32_LogicalDisk on the local machine and gets freespace (GB), 
+    size (GB), and percent free for each disk using default credentials through a CIM session
 
 .EXAMPLE
     Get-d00mDiskSpace -ComputerName Computer1, Computer2
 
-    This example queries Win32_LogicalDisk on the remote computers,
-    Computer1 and Computer2, and gets freespace (GB), size (GB), and 
-    percent free for each disk using default credentials through CIM
-    sessions
+    This example queries Win32_LogicalDisk on the remote computers, Computer1 and Computer2, 
+    and gets freespace (GB), size (GB), and percent free for each disk using default 
+    credentials through CIM sessions
 
 .EXAMPLE
     'Computer1' | Get-d00mDiskSpace -Credential (Get-Credential)
 
-    This example queries Win32_LogicalDisk on the piped in computer
-    name, Computer1, and gets freespace (GB), size (GB), and percent
-    free for each disk using specified credentials through a CIM
-    session
+    This example queries Win32_LogicalDisk on the piped in computer name, Computer1, and gets 
+    freespace (GB), size (GB), and percent free for each disk using specified credentials 
+    through a CIM session
 
 #>
 function Get-d00mDiskSpaceReport
@@ -1316,9 +1350,15 @@ function Get-d00mDiskSpaceReport
     param
     (
         #Computers to query disk space
-        [parameter(ValueFromPipeline = $true,
-                   ValueFromPipelineByPropertyName = $true)]
-        [string[]]$ComputerName = $env:COMPUTERNAME,
+        [alias('name')]
+        [parameter(Mandatory,
+                   ValueFromPipeline,
+                   ValueFromPipelineByPropertyName)]
+        [string[]]$ComputerName,
+
+        #File system path to save the report
+        [parameter()]
+        [string]$FilePath = $(Get-Location),
 
         #Credentials to use for accessing computer
         [parameter()]
@@ -1340,6 +1380,51 @@ function Get-d00mDiskSpaceReport
             Write-Verbose -Message ('{0} : {1} : Begin execution' -f $cmdletName, $computer)
             try
             {
+                $html = New-Object -TypeName System.Text.StringBuilder
+                $html.AppendLine("<html>
+                                <head>
+                                    <title>$($computer) Disk Space Inventory</title>
+                                    <style>
+                                        table, tr, td {
+                                            border: 1px solid green;
+                                            border-collapse: collapse;
+                                        }
+
+                                        tr.alt td {
+                                            background-color: `#171717;
+                                        }
+
+                                        tr.heading td {
+                                            font-weight: bold;
+                                            text-align: center;
+                                            font-size: larger;
+                                            color: white;
+                                            background-color: `#333333;
+                                        }
+
+                                        body {
+                                            background-color: black;
+                                            color: `#bdbdbd;
+                                            font-family: lucida consolas, monospace;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    <table>
+                                        <tr class=`"heading`">
+                                            <td colspan=`"2`">$($computer)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Report</td>
+                                            <td>Date</td>
+                                        </tr>
+                                        <tr>
+                                            <td>$($cmdletName)</td>
+                                            <td>$(Get-Date)</td>
+                                        </tr>
+                                    </table>
+                                </br>") | Out-Null
+
                 $sessionParams = @{ComputerName = $computer
                                    ErrorAction  = 'Stop'}
                 if ($Credential -ne $null)
@@ -1355,15 +1440,40 @@ function Get-d00mDiskSpaceReport
 
                 $cimParams = @{ClassName  = 'Win32_LogicalDisk'
                                CimSession = $cimSession
-                               Filter     = 'DriveType<>5'}
+                               Filter     = 'DriveType=3'}
                 Get-CimInstance @cimParams | ForEach-Object {
-                    New-Object -TypeName psobject -Property @{ComputerName = $computer
-                                                              DeviceId     = $_.DeviceID
-                                                              VolumeName   = $_.VolumeName
-                                                              Size         = [math]::Round($_.Size/1GB)
-                                                              FreeSpace    = [math]::Round($_.FreeSpace/1GB)
-                                                              PercentFree  = [math]::Round(($_.FreeSpace/$_.Size)*100)}
-                } | Write-Output
+                    $html.AppendLine(('
+                                <table>
+                                    <tr class="heading">
+                                        <td>DeviceID</td>
+                                        <td>{0}</td>
+                                    </tr>
+                                    <tr class="alt">
+                                        <td>VolumeName</td>
+                                        <td>{1}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Size (GB)</td>
+                                        <td>{2}</td>
+                                    </tr>
+                                    <tr class="alt">
+                                        <td>FreeSpace (GB)</td>
+                                        <td>{3}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PercentFree</td>
+                                        <td>{4}</td>
+                                    </tr>
+                                </table>
+                                </br>' -f $_.DeviceID,
+                                          $_.VolumeName,
+                                          [math]::Round($_.Size/1GB),
+                                          [math]::Round($_.FreeSpace/1GB),
+                                          [math]::Round(($_.FreeSpace/$_.Size)*100))) | Out-Null
+                }
+                $html.AppendLine('</body></html>') | Out-Null
+                $html.ToString() | Out-File -FilePath (Join-Path -Path $FilePath -ChildPath ('{0}_DiskSpaceReport_{1}.html' -f $computer, (Get-Date -Format 'yyyyMMdd'))) -Force
+                Remove-CimSession -CimSession $cimSession
             }
 
             catch
@@ -1392,29 +1502,53 @@ function Get-d00mDiskSpaceReport
     Query Win32_Processor.DataWidth and Win32_OperatingSystem.OSArchitecture for
     32 or 64-bit
 
+.PARAMETER ComputerName
+    The computers to which to execute this report
+
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
+
 .EXAMPLE
-    Get-d00mArchitecture
+    Get-d00mArchitecture -ComputerName LocalHost
 
     This example queries Win32_Processor.DataWidth and Win32_OperatingSystem.OSArchitecture
-    for 32 or 64-bit on the local computer using default credentials
+    for 32 or 64-bit on the local computer using default credentials and save the report in
+    the current directory
 
 .EXAMPLE
     Get-d00mArchitecture -ComputerName computer1, computer2 -Credential (Get-Credential)
 
     This example queries Win32_Processor.DataWidth and Win32_OperatingSystem.OSArchitecture
     on the remote computers, computer1 and computer2, for 32 or 64-bit using the supplied
-    credentials
+    credentials and save the report in the current directory
+
+.EXAMPLE
+    Get-d00mArchitecture -ComputerName Computer1 -FilePath \\server1\share
+
+    This example queries Win32_Processor.DataWidth and Win32_OperatingSystem.OSArchitecture
+    on the computer computer, computer1, for the 32 or 64-bit using the default credentials
+    and saves the report in the directory specified
 #>
 function Get-d00mArchitectureReport
 {
     [CmdletBinding()]
     param
     (
-        [parameter(ValueFromPipeline,
-                   ValueFromPipelineByPropertyName,
-                   Position=0)]
+        #Computers to query architecture
+        [alias('name')]
+        [parameter(Mandatory,
+                   ValueFromPipeline,
+                   ValueFromPipelineByPropertyName)]
         [string[]]$ComputerName = $env:COMPUTERNAME,
 
+        #File system path to save the report
+        [parameter()]
+        [string]$FilePath = $(Get-Location),
+
+        #Credential to use for CIM session
         [parameter()]
         [pscredential]$Credential
     )
@@ -1431,6 +1565,51 @@ function Get-d00mArchitectureReport
     {
         foreach ($computer in $ComputerName)
         {
+                $html = New-Object -TypeName System.Text.StringBuilder
+                $html.AppendLine("<html>
+                                <head>
+                                    <title>$($computer) Architecture Report</title>
+                                    <style>
+                                        table, tr, td {
+                                            border: 1px solid green;
+                                            border-collapse: collapse;
+                                        }
+
+                                        tr.alt td {
+                                            background-color: `#171717;
+                                        }
+
+                                        tr.heading td {
+                                            font-weight: bold;
+                                            text-align: center;
+                                            font-size: larger;
+                                            color: white;
+                                            background-color: `#333333;
+                                        }
+
+                                        body {
+                                            background-color: black;
+                                            color: `#bdbdbd;
+                                            font-family: lucida consolas, monospace;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    <table>
+                                        <tr class=`"heading`">
+                                            <td colspan=`"2`">$($computer)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Report</td>
+                                            <td>Date</td>
+                                        </tr>
+                                        <tr>
+                                            <td>$($cmdletName)</td>
+                                            <td>$(Get-Date)</td>
+                                        </tr>
+                                    </table>
+                                </br>") | Out-Null
+
             Write-Verbose -Message ('{0} : {1} : Begin processing' -f $cmdletName, $computer)
             $sessionParams = @{ComputerName = $computer
                                ErrorAction  = 'Stop'}
@@ -1454,25 +1633,23 @@ function Get-d00mArchitectureReport
             
             Remove-CimSession -CimSession $session
 
-            if ($procArch.Count -gt 1)
+            $html.AppendLine(('
+                <table>
+                    <tr class="alt">
+                        <td>OS Architecture</td>
+                        <td>{0}</td>
+                    </tr>' -f $osArch.OSArchitecture)) | Out-Null
+            
+            foreach ($p in $procArch)
             {
-                Write-Verbose -Message ('{0} : {1} : Detected more than 1 processor' -f $cmdletName, $computer)
-                foreach ($p in $procArch)
-                {
-                    New-Object -TypeName psobject -Property @{ComputerName          = $computer
-                                                              ProcessorArchitecture = ('{0} : {1}' -f $p.DeviceID, $p.DataWidth)
-                                                              OSArchitecture        = $osArch.OSArchitecture} |
-                        Write-Output
-                }
+                $html.AppendLine(('
+                    <tr>
+                        <td>{0}</td>
+                        <td>{1}</td>
+                    </tr>' -f $p.DeviceID, $p.DataWidth)) | Out-Null
             }
-            else
-            {
-                Write-Verbose -Message ('{0} : {1} : Detected 1 processor' -f $cmdletName, $computer)
-                New-Object -TypeName psobject -Property @{ComputerName          = $computer
-                                                          ProcessorArchitecture = ('{0} : {1}' -f $procArch.DeviceID, $procArch.DataWidth)
-                                                          OSArchitecture        = $osArch.OSArchitecture} |
-                    Write-Output
-            }
+            $html.AppendLine('</table></body></html>') | Out-Null
+            $html.ToString() | Out-File -FilePath (Join-Path -Path $FilePath -ChildPath ('{0}_ArchitectureReport_{1}.html' -f $computer, (Get-Date -Format 'yyyyMMdd'))) -Force
         }
     }
 
@@ -1493,6 +1670,15 @@ function Get-d00mArchitectureReport
     Iterate through available event logs for Error, Warning, or FailureAudit
     event entires generated in the past 24 hours and saves the report in the
     current directory using current credentials by default
+
+.PARAMETER ComputerName
+    The computers to which to execute this report
+
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
     
 .EXAMPLE
     Get-d00mEventLogReport -ComputerName Computer1
@@ -1523,7 +1709,9 @@ function Get-d00mEventLogReport
     [CmdletBinding()]
     param
     (
-        [parameter(ValueFromPipeline,
+        [alias('name')]
+        [parameter(Mandatory,
+                   ValueFromPipeline,
                    ValueFromPipelineByPropertyName)]
         [string[]]$ComputerName,
 
@@ -1538,7 +1726,6 @@ function Get-d00mEventLogReport
     {
         $timer = New-Object -TypeName System.Diagnostics.StopWatch
         $cmdletName = $PSCmdlet.MyInvocation.MyCommand.Name
-        $start      = Get-Date
         Write-Verbose -Message ('{0} : Begin execution : {1}' -f $cmdletName, (Get-Date))
         $timer.Start()
     }
@@ -1712,39 +1899,60 @@ function Get-d00mEventLogReport
 
 <#
 .SYNOPSIS
-    Generate WinSat scores
+    Generate WinSat scores HTML report
 
 .DESCRIPTION
     Run winsat.exe prepop on computers and get Win32_WinSat scores
 
+.PARAMETER ComputerName
+    The computers to which to execute this report
+
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
+
 .EXAMPLE
-    Get-d00mWinsatScore
+    Get-d00mWinsatScoreReport -ComputerName localhost
 
     This runs winsat.exe prepop on the local computer and returns
-    the Win32_WinSat scores using default credentials
+    the Win32_WinSat scores using default credentials and saves the report in the current directory
 
 .EXAMPLE
-    Get-d00mWinsatScore -ComputerName Computer1, Computer2
+    Get-d00mWinsatScoreReport -ComputerName Computer1, Computer2
 
     This runs winsat.exe prepop on the remote computers, Computer1
     and Computer2, and returns the Win32_WinSat scores using default
-    credentials
+    credentials and saves the report in the current directory
 
 .EXAMPLE
-    Get-d00mWinsatScore -Credential (Get-Credential)
+    Get-d00mWinsatScoreReport -ComputerName localhost -Credential (Get-Credential)
 
     This runs winsat.exe prepop on the local computer and returns
-    the Win32_WinSat scores using the specified credentials
+    the Win32_WinSat scores using the specified credentials and saves the report in the current directory
 
+.EXAMPLE
+    Get-d00mWinsatScoreReport -ComputerName Computer1, Computer2 -FilePath \\server1\share
+
+    This runs winsat.exe prepop on the remote computers, computer1 and Computer2, and returns
+    the Win32_WinSat scores using default credentials and saves the report in the filepath
+    specified
 #>
 function Get-d00mWinsatScoreReport
 {
     [CmdletBinding()]
     param
     (
-        [Parameter(ValueFromPipeline,
+        [alias('name')]
+        [Parameter(Mandatory,
+                   ValueFromPipeline,
                    ValueFromPipelineByPropertyName)]
-        [string[]]$ComputerName = $env:COMPUTERNAME,
+        [string[]]$ComputerName,
+
+        #File system path to save the report
+        [parameter()]
+        [string]$FilePath = $(Get-Location),
 
         [Parameter()]
         [pscredential]$Credential
@@ -1754,7 +1962,6 @@ function Get-d00mWinsatScoreReport
     {
         $timer = New-Object -TypeName System.Diagnostics.StopWatch
         $cmdletName = $PSCmdlet.MyInvocation.MyCommand.Name
-        $start      = Get-Date
         Write-Verbose -Message ('{0} : Begin execution : {1}' -f $cmdletName, (Get-Date))
         $timer.Start()
     }
@@ -1763,6 +1970,52 @@ function Get-d00mWinsatScoreReport
     {
         foreach ($computer in $ComputerName)
         {
+            $html = New-Object -TypeName System.Text.StringBuilder
+            $html.AppendLine("
+                <html>
+                    <head>
+                        <title>$($computer) WinSat Score Report</title>
+                        <style>
+                            table, tr, td {
+                                border: 1px solid green;
+                                border-collapse: collapse;
+                            }
+
+                            tr.alt td {
+                                background-color: `#171717;
+                            }
+
+                            tr.heading td {
+                                font-weight: bold;
+                                text-align: center;
+                                font-size: larger;
+                                color: white;
+                                background-color: `#333333;
+                            }
+            
+                            body {
+                                background-color: black;
+                                color: `#bdbdbd;
+                                font-family: lucida consolas, monospace;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <table>
+                            <tr class=`"heading`">
+                                <td colspan=`"2`">$($computer)</td>
+                            </tr>
+                            <tr>
+                                <td>Report</td>
+                                <td>$($cmdletName)</td>
+                            </tr>
+                            <tr>
+                                <td>Date</td>
+                                <td>$(Get-Date)</td>
+                            </tr>
+                        </table>
+                        </br>") | Out-Null
+
             $sessionParams = @{ComputerName = $computer
                                ErrorAction  = 'Stop'}
             if ($Credential -ne $null)
@@ -1790,13 +2043,37 @@ function Get-d00mWinsatScoreReport
             $cim = Get-CimInstance @cimParams
             Remove-CimSession -CimSession $cimSession
 
-            New-Object -TypeName psobject -Property @{ComputerName  = $computer
-                                                      CPUScore      = $cim.CPUScore
-                                                      D3DScore      = $cim.D3DScore
-                                                      DiskScore     = $cim.DiskScore
-                                                      GraphicsScore = $cim.GraphicsSCore
-                                                      MemoryScore   = $cim.MemoryScore} |
-                Write-Output
+            $html.AppendLine(('
+                <table>
+                    <tr class="heading">
+                        <td colspan="2">WinSat Scores</td>
+                    </tr>
+                    <tr>
+                        <td>CPUScore</td>
+                        <td>{0}</td>
+                    </tr>
+                    <tr>
+                        <td>D3DScore</td>
+                        <td>{1}</td>
+                    </tr>
+                    <tr>
+                        <td>DiskScore</td>
+                        <td>{2}</td>
+                    </tr>
+                    <tr>
+                        <td>GraphicsScore</td>
+                        <td>{3}</td>
+                    </tr>
+                    <tr>
+                        <td>MemoryScore</td>
+                        <td>{4}</td>
+                    </tr>
+                </table></body></html>' -f $cim.CPUScore,
+                                           $cim.D3DScore,
+                                           $cim.DiskScore,
+                                           $cim.GraphicsScore,
+                                           $cim.MemoryScore)) | Out-Null
+            $html.ToString() | Out-File -FilePath (Join-Path -Path $FilePath -ChildPath ('{0}_WinSatScoreReport_{1}.html' -f $computer, (Get-Date -Format 'yyyyMMdd'))) -Force
         }
     }
 
@@ -1815,6 +2092,15 @@ function Get-d00mWinsatScoreReport
 
 .DESCRIPTION
     Queries WMIMonitorID to generate a HTML report
+
+.PARAMETER ComputerName
+    The computers to which to execute this report
+
+.PARAMETER FilePath
+    The directory to save the HTML report. The default is the current directory.
+
+.PARAMETER Credential
+    The credential to use when creating a CIM session to the computer. The default is the current users credentials.
 
 .EXAMPLE
     Get-d00mMonitorReport -ComputerName Computer1
